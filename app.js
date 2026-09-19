@@ -10,10 +10,11 @@ const themeToggle = document.querySelector("#theme-toggle");
 const filterButtons = document.querySelectorAll("[data-filter]");
 
 const THEME_STORAGE_KEY = "offline-todo-theme";
+const FILTER_STORAGE_KEY = "offline-todo-filter";
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 let todos = loadTodos();
-let currentFilter = "all";
+let currentFilter = loadFilter();
 
 // 從瀏覽器儲存空間讀取待辦資料，若資料損壞則回到空清單。
 function loadTodos() {
@@ -28,6 +29,12 @@ function loadTodos() {
 // 將目前清單保存到瀏覽器，重新整理後仍可保留。
 function saveTodos() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+function loadFilter() {
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+  const validFilters = ["all", "active", "completed"];
+  return validFilters.includes(savedFilter) ? savedFilter : "all";
 }
 
 // 取得目前主題；沒有手動選擇時讓 CSS 跟隨作業系統設定。
@@ -167,6 +174,7 @@ themeToggle.addEventListener("click", () => {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     currentFilter = button.dataset.filter;
+    localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
     renderTodos();
   });
 });
